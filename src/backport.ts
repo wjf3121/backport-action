@@ -33,13 +33,14 @@ export type Config = {
   copy_assignees: boolean;
   copy_requested_reviewers: boolean;
   experimental: Experimental;
+  pull_number: number
 };
 
 type Experimental = {
   detect_merge_method: boolean;
 };
 const experimentalDefaults: Experimental = {
-  detect_merge_method: false,
+  detect_merge_method: true,
 };
 export { experimentalDefaults };
 
@@ -65,7 +66,7 @@ export class Backport {
       const payload = this.github.getPayload();
       const owner = this.github.getRepo().owner;
       const repo = payload.repository?.name ?? this.github.getRepo().repo;
-      const pull_number = this.github.getPullNumber();
+      const pull_number = this.config.pull_number === 0 ? this.github.getPullNumber() : this.config.pull_number;
       const mainpr = await this.github.getPullRequest(pull_number);
 
       if (!(await this.github.isMerged(mainpr))) {
